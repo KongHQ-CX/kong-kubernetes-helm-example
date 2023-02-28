@@ -1,0 +1,98 @@
+image:
+   repository: kong/kong-gateway
+   tag: 3.1.1.2-alpine
+   pullPolicy: IfNotPresent
+
+env:
+  database: "off"
+  
+  role: data_plane
+
+  proxy_listen: "0.0.0.0:8443 ssl http2"
+
+  # Communication to push config to data-plane (wss)
+  cluster_control_plane: kongcp-kong-cluster.cp.svc.cluster.local:8005
+  # Communication to push vitals to control plane
+  cluster_telemetry_endpoint: kongcp-kong-clustertelemetry.cp.svc.cluster.local:8006
+  # Certificates for cluster communication
+  #lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
+  lua_ssl_trusted_certificate: /etc/secrets/kong-ssl-cert/tls.crt
+  lua_ssl_verify_depth: 2
+  log_level: error
+
+  # SSL certs settings for HTTPS proxy
+  ssl_cert_key: /etc/secrets/kong-ssl-cert/tls.key
+  ssl_cert: /etc/secrets/kong-ssl-cert/tls.crt
+
+  # Cluster certs settings for CP-DP
+  # shared mode
+  #cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  #cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+  # pki mode
+  cluster_mtls: "pki"
+  cluster_cert: /etc/secrets/kong-data-plane-cert/tls.crt
+  cluster_ca_cert: 
+    valueFrom:
+      secretKeyRef:
+        name: kong-ca-cert
+        key: ca-cert.pem
+  cluster_cert_key: /etc/secrets/kong-data-plane-cert/tls.key
+  cluster_server_name: controlplane.example.com
+
+  trusted_ips: "0.0.0.0/0,::/0"
+  real_ip_recursive: "on"
+  real_ip_header: "X-Forwarded-For"
+
+secretVolumes:
+  # - kong-cluster-cert
+  - kong-ssl-cert
+  - kong-ca-cert
+  - kong-data-plane-cert
+  - kong-lmdb-backup
+
+## Data plane proxy
+proxy:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+    konghq.com/protocol: "http"
+  http:
+    enabled: false
+    servicePort: 8000
+    containerPort: 8000
+  tls:
+    enabled: true
+    servicePort: 8443
+    containerPort: 8443
+    parameters:
+      - http2
+  labels:
+    enable-metrics: "true"
+
+admin:
+  enabled: false
+
+portal:
+  enabled: false
+
+portalapi:
+  enabled: false
+
+manager:
+  enabled: false
+
+ingressController:
+  enabled: false
+
+enterprise:
+  enabled: true
+  #license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+
+replicaCount: 1
+
+deployment:
+  serviceAccount:
+    automountServiceAccountToken: true

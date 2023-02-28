@@ -1,0 +1,10 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = manager.example.com
+DNS.2 = adminapi.example.com
+DNS.3 = portal.example.com
+DNS.4 = portalapi.example.com
+DNS.5 = api.example.com

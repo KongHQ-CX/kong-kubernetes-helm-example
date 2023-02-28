@@ -1,0 +1,249 @@
+## Environment variables
+env:
+  role: control_plane
+
+  database: "postgres"
+  pg_host: kongpg-postgresql.pg.svc.cluster.local
+  pg_user: postgres
+  pg_database: kong
+  pg_password:
+    valueFrom:
+      secretKeyRef:
+        name: kong-enterprise-postgres-password
+        key: password
+  
+  admin_api_uri: https://adminapi.example.com:8444
+  admin_gui_url: https://manager.example.com:8445
+  portal_api_url: https://portalapi.example.com:8447
+  portal_gui_host: portal.example.com:8446
+  portal_gui_protocol: https
+  
+  #lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
+  lua_ssl_trusted_certificate: /etc/secrets/kong-ssl-cert/tls.crt
+  lua_ssl_verify_depth: 2
+  log_level: notice
+  
+  # SSL certs settings for HTTPS Admin API
+  admin_ssl_cert_key: /etc/secrets/kong-ssl-cert/tls.key
+  admin_ssl_cert: /etc/secrets/kong-ssl-cert/tls.crt
+
+  # SSL certs settings for HTTPS Manager
+  admin_gui_ssl_cert_key: /etc/secrets/kong-ssl-cert/tls.key
+  admin_gui_ssl_cert: /etc/secrets/kong-ssl-cert/tls.crt
+
+  # SSL certs settings for HTTPS Portal
+  portal_gui_ssl_cert_key: /etc/secrets/kong-ssl-cert/tls.key
+  portal_gui_ssl_cert: /etc/secrets/kong-ssl-cert/tls.crt
+
+  # SSL certs settings for HTTPS Portal API
+  portal_api_ssl_cert_key: /etc/secrets/kong-ssl-cert/tls.key
+  portal_api_ssl_cert: /etc/secrets/kong-ssl-cert/tls.crt
+
+  # Cluster certs settings for CP-DP
+  # shared mode
+  #cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  #cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+  # pki mode
+  #cluster_mtls: "pki"
+  #cluster_cert: /etc/secrets/kong-control-plane-cert/tls.crt
+  #cluster_cert_key: /etc/secrets/kong-control-plane-cert/tls.key
+  #cluster_ca_cert: /etc/secrets/kong-ca-cert/tls.crt
+  # pki_check_cn mode - only allows specific CN from data plane
+  cluster_mtls: "pki_check_cn"
+  cluster_cert: /etc/secrets/kong-control-plane-cert/tls.crt
+  cluster_cert_key: /etc/secrets/kong-control-plane-cert/tls.key
+  cluster_ca_cert: 
+    valueFrom:
+      secretKeyRef:
+        name: kong-ca-cert
+        key: ca-cert.pem
+  cluster_allowed_common_names: dp1.example.com,dp2.example.com
+
+  anonymous_reports: "off"
+  untrusted_lua: "off"
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: kong-enterprise-superuser-password
+        key: password
+  
+  portal_auth: basic-auth
+  #portal_auth: key-auth
+  #portal_auth: openid-connect
+  
+  portal_auth_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-auth-conf
+        key: portal_auth_conf
+  portal_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-conf
+        key: portal_session_conf
+
+  admin_gui_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-config
+        key: admin_gui_session_conf
+
+## Kong version
+image:
+  repository: kong/kong-gateway
+  tag: 3.1.1.2-alpine
+  pullPolicy: IfNotPresent
+# Specify Kong admin API service and listener configuration
+admin:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+    konghq.com/protocol: "http"
+  http:
+    enabled: false
+    servicePort: 8001
+    containerPort: 8001
+    parameters: []
+  tls:
+    enabled: true
+    servicePort: 8444
+    containerPort: 8444
+    parameters:
+      - http2
+      - ssl
+  ingress:
+    enabled: false
+## Kong Manager    
+manager:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+    konghq.com/protocol: "http"
+  http:
+    enabled: false
+    servicePort: 8002
+    containerPort: 8002
+    parameters: []
+  tls:
+    enabled: true
+    servicePort: 8445
+    containerPort: 8445
+    parameters:
+      - http2
+      - ssl
+  ingress:
+    enabled: false
+    # hostname: manager.local.lan
+    # annotations: 
+    #   kubernetes.io/ingress.class: kong
+    #   konghq.com/protocols: https
+    # tls:
+    #   kong-ssl-cert
+  externalIPs: []
+## Portal 
+portal:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+    konghq.com/protocol: "http"
+  http:
+    enabled: false
+    servicePort: 8003
+    containerPort: 8003
+    parameters: []
+  tls:
+    enabled: true
+    servicePort: 8446
+    containerPort: 8446
+    parameters:
+      - http2
+      - ssl
+  ingress:
+    enabled: false
+  externalIPs: []
+## Portal API
+portalapi:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+    konghq.com/protocol: "http"
+  http:
+    enabled: false
+    servicePort: 8004
+    containerPort: 8004
+    parameters: []
+  tls:
+    enabled: true
+    servicePort: 8447
+    containerPort: 8447
+    parameters:
+      - http2
+      - ssl
+  ingress:
+    enabled: false
+  externalIPs: []
+proxy:
+  enabled: false
+## cluster address for DP to talk to
+cluster:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  tls:
+    enabled: true
+    servicePort: 8005
+    containerPort: 8005
+    parameters: []
+  externalIPs: []
+## cluster telemetry address for DP to talk to
+clustertelemetry:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  tls:
+    enabled: true
+    servicePort: 8006
+    containerPort: 8006
+    parameters: []
+  externalIPs: []
+## internal status endpoint
+status:
+  http:
+    enabled: true
+    containerPort: 8100
+## enterprise features
+enterprise:
+  enabled: true
+  #license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+  portal:
+    enabled: true
+  rbac:
+    enabled: true
+    admin_gui_auth: basic-auth
+    session_conf_secret: kong-session-conf
+    admin_gui_auth_conf_secret: kong-auth-conf
+## No Ingress controller
+ingressController:
+  enabled: false
+## mount screts
+secretVolumes:
+  # - kong-cluster-cert
+  - kong-ssl-cert
+  - kong-ca-cert
+  - kong-control-plane-cert
+##
+waitImage:
+  pullPolicy: IfNotPresent
+  lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "/bin/sleep 15 && kong quit"]
+## Servie monitor for premetheus operator
+serviceMonitor:
+  enabled: true
