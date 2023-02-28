@@ -21,7 +21,7 @@ Generate
 ### 1.2 Certs for TLS
 Command `certs/generateCPendpointCerts.sh`
 
-Generate the * cert for all the https enpoints.
+Generate the * cert for all the https enpo
 The same * cert is used to keep the example simple for control plane and data plane.
 
 ## 2. Run the charts
@@ -39,8 +39,16 @@ Command
 
 Install helm chart for first time.
 
-### 2.2 First Install
+### 2.2 Upgrade
 Command
 `helm_setup.sh upgrade`
 
 Upgrade existing helm deployment. After first install
+
+## Folder structure
+1. certs
+Certificates are stored here
+2. charts
+All the helm chart values are stored here
+3. conf
+Sample dummy configuration for Kong is stored here
