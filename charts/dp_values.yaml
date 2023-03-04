@@ -48,7 +48,6 @@ secretVolumes:
   - kong-ssl-cert
   - kong-ca-cert
   - kong-data-plane-cert
-  - kong-lmdb-backup
 
 ## Data plane proxy
 proxy:
