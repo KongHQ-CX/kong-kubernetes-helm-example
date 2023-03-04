@@ -39,10 +39,6 @@ env:
   cluster_cert_key: /etc/secrets/kong-data-plane-cert/tls.key
   cluster_server_name: controlplane.example.com
 
-  trusted_ips: "0.0.0.0/0,::/0"
-  real_ip_recursive: "on"
-  real_ip_header: "X-Forwarded-For"
-
 secretVolumes:
   # - kong-cluster-cert
   - kong-ssl-cert
