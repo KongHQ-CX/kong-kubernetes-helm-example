@@ -27,15 +27,9 @@ The same * cert is used to keep the example simple for control plane and data pl
 ## 2. Run the charts
 View the script `helm_setup.sh` to check how to deploy kong.
 
-### 2.1 Clean up only
+### 2.1 First Install
 Command
-`helm_setup.sh clean`
-
-Delete all the charts and namespaces.
-
-### 2.2 First Install
-Command
-`helm_setup.sh` 
+`helm_setup.sh new` 
 
 Install helm chart for first time.
 
@@ -44,6 +38,12 @@ Command
 `helm_setup.sh upgrade`
 
 Upgrade existing helm deployment. After first install
+
+### 2.3 Clean up only
+Command
+`helm_setup.sh clean`
+
+Delete all the charts and namespaces.
 
 ## Folder structure
 1. certs
