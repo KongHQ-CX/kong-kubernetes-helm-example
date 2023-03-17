@@ -78,7 +78,7 @@ then
     ## shared mode cluster certs
     # kubectl create secret tls kong-cluster-cert --cert=./certs/hybrid/cluster.crt --key=./certs/hybrid/cluster.key -n dp
     ## pki mode CA and data plabe certs
-    kubectl create secret tls kong-ca-cert --cert=./certs/ca_cert/ca-cert.pem --key=./certs/ca_cert/ca-cert.key -n dp
+    kubectl create secret generic kong-ca-cert --from-file=./certs/ca_cert/ca-cert.pem -n dp
     kubectl create secret tls kong-data-plane-cert --cert=./certs/dp_cert/data-plane.crt --key=./certs/dp_cert/data-plane.key -n dp
     # gui and api
     #kubectl create secret tls kong-ssl-cert --cert=./certs/ssl/server.crt --key=./certs/ssl/server.key -n dp
