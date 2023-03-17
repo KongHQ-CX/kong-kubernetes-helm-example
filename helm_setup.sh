@@ -1,7 +1,7 @@
 # Kong Helm deployment script
 
 # Delete the namespace and helm charts and stop
-if [ $1 == "clean" ]
+if [ "$1" == "clean" ]
 then
     echo "Starting cleanup =============================="
 
@@ -26,7 +26,8 @@ then
     echo "Cleanup complete."
     
     exit
-elif [ $1 == "upgrade" ]
+elif [ "$1" == "upgrade" ]
+then
     echo "Starting upgrade =============================="
 
     #echo "Upgrade Postgres helm charts -------------------------"
@@ -38,7 +39,8 @@ elif [ $1 == "upgrade" ]
     echo "Upgrade Data Plane helm charts -------------------------"
     helm upgrade kongdp  kong/kong --values=./charts/dp_values.yaml -n dp
 
-elif [ $1 == "new" ]
+elif [ "$1" == "new" ]
+then
     echo "Starting new =============================="
     echo "Creating Namespaces -------------------------"
     #create k8s namespaces
