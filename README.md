@@ -27,6 +27,14 @@ The same * cert is used to keep the example simple for control plane and data pl
 ## 2. Run the charts
 View the script `helm_setup.sh` to check how to deploy kong.
 
+### NOTE
+Include the charts
+```
+helm repo add kong https://charts.konghq.com
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+
 ### 2.1 First Install
 Command
 `helm_setup.sh new` 
